@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Rediger profil</title>
+</head>
+<body>
+    <h2>Rediger din profil</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="post">
+        <label>Fornavn:</label>
+        <input type="text" name="fornavn" value="{{ user[0] }}" required>
+        <label>Efternavn:</label>
+        <input type="text" name="efternavn" value="{{ user[1] }}" required>
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ user[2] }}" required>
+        <label>Adresse:</label>
+        <input type="text" name="address" value="{{ user[3] }}">
+        <label>Alder:</label>
+        <input type="number" name="age" value="{{ user[4] }}">
+        <label>Størrelse:</label>
+        <input type="text" name="size" value="{{ user[5] }}">
+        <label>Ny adgangskode (valgfrit):</label>
+        <input type="password" name="password">
+        <button type="submit">Opdater</button>
+    </form>
+    <br>
+    <a href="{{ url_for('Min_profil') }}">Tilbage til Min profil</a>
+</body>
+</html>

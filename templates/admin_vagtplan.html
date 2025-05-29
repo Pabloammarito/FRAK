@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Opret ny vagt sektion -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Opret ny vagt</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('tildel_vagt_opgave') }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Dato</label>
+                        <input type="date" name="vagt_date" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Timer</label>
+                        <input type="number" name="vagt_hours" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Medarbejdere</label>
+                        <select name="medarbejdere" class="form-control" multiple>
+                            {% for m in medarbejdere %}
+                            <option value="{{ m.id }}">{{ m.fornavn }} {{ m.efternavn }} ({{ m.email }})</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Hold Ctrl/Cmd for at vælge flere</small>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Opret vagt</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Afventende vagter -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h4>Afventende vagter</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Medarbejder info</th>
+                        <th>Vagt detaljer</th>
+                        <th>Status</th>
+                        <th>Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vagt in afventende_vagter %}
+                    <tr>
+                        <td>
+                            <strong>Navn:</strong> {{ vagt.user_name }}<br>
+                            <strong>Email:</strong> {{ vagt.email }}<br>
+                            <strong>Telefon:</strong> {{ vagt.phone }}
+                        </td>
+                        <td>
+                            <strong>Dato:</strong> {{ vagt.date }}<br>
+                            <strong>Timer:</strong> {{ vagt.hours }}<br>
+                            <strong>Tildelt:</strong> {{ vagt.created_at }}
+                        </td>
+                        <td>
+                            {% if vagt.confirmed == 2 %}
+                                <span class="badge bg-danger">Afvist</span>
+                            {% else %}
+                                <span class="badge bg-warning">Afventer</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if vagt.confirmed == 2 %}
+                                <a href="{{ url_for('fjern_vagt', vagt_id=vagt.id) }}" 
+                                   class="btn btn-sm btn-danger">Fjern vagt</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bekræftede vagter -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4>Bekræftede vagter</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Medarbejder info</th>
+                        <th>Vagt detaljer</th>
+                        <th>Bekræftelse info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vagt in bekraeftede_vagter %}
+                    <tr>
+                        <td>
+                            <strong>Navn:</strong> {{ vagt.user_name }}<br>
+                            <strong>Email:</strong> {{ vagt.email }}<br>
+                            <strong>Telefon:</strong> {{ vagt.phone }}
+                        </td>
+                        <td>
+                            <strong>Dato:</strong> {{ vagt.date }}<br>
+                            <strong>Timer:</strong> {{ vagt.hours }}
+                        </td>
+                        <td>
+                            <span class="badge bg-success">Bekræftet</span><br>
+                            <small>{{ vagt.confirmed_at }}</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Dagens arbejde -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4>Dagens arbejde</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Medarbejder</th>
+                        <th>Dato</th>
+                        <th>Opgave</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for arbejde in dagens_arbejde %}
+                    <tr>
+                        <td>{{ arbejde[-1] }}</td> <!-- u.name er sidste kolonne -->
+                        <td>{{ arbejde[1] }}</td>   <!-- date -->
+                        <td>{{ arbejde[2] }}</td>   <!-- job -->
+                        <td>
+                            {% if arbejde[5] == 0 %}
+                                <span class="badge bg-secondary">Afventer</span>
+                            {% elif arbejde[5] == 1 %}
+                                <span class="badge bg-info">Igang</span>
+                            {% elif arbejde[5] == 2 %}
+                                <span class="badge bg-success">Afsluttet</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Vagtanmodninger -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4>Vagtanmodninger</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Medarbejder info</th>
+                        <th>Anmodning detaljer</th>
+                        <th>Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for anmodning in vagtanmodninger %}
+                    <tr>
+                        <td>
+                            <strong>Navn:</strong> {{ anmodning.user_name }}<br>
+                            <strong>Email:</strong> {{ anmodning.email }}<br>
+                            <strong>Telefon:</strong> {{ anmodning.phone }}
+                        </td>
+                        <td>
+                            <strong>Dato:</strong> {{ anmodning.date }}<br>
+                            <strong>Timer:</strong> {{ anmodning.hours }}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('admin_vagtanmodning', anmodning_id=anmodning.id, status=1) }}" 
+                                   class="btn btn-sm btn-success">Godkend</a>
+                                <a href="{{ url_for('admin_vagtanmodning', anmodning_id=anmodning.id, status=2) }}" 
+                                   class="btn btn-sm btn-danger">Afslå</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Afviste vagter -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h4>Afviste vagter</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Medarbejder info</th>
+                        <th>Vagt detaljer</th>
+                        <th>Begrundelse</th>
+                        <th>Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vagt in afviste_vagter %}
+                    <tr>
+                        <td>
+                            <strong>Navn:</strong> {{ vagt.user_name }}<br>
+                            <strong>Email:</strong> {{ vagt.email }}<br>
+                            <strong>Telefon:</strong> {{ vagt.phone }}
+                        </td>
+                        <td>
+                            <strong>Dato:</strong> {{ vagt.date }}<br>
+                            <strong>Timer:</strong> {{ vagt.hours }}<br>
+                            <strong>Afvist:</strong> {{ vagt.confirmed_at }}
+                        </td>
+                        <td>
+                            <div class="alert alert-danger">
+                                {{ vagt.afslag_grund or 'Ingen begrundelse angivet' }}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('fjern_vagt', vagt_id=vagt.id) }}" 
+                               class="btn btn-sm btn-danger">Fjern vagt</a>
+                            <a href="{{ url_for('gentildel_vagt', vagt_id=vagt.id) }}" 
+                               class="btn btn-sm btn-warning">Gentildel</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Eksempel på hvordan du kan opdatere linket i en admin_vagtplan.html fil -->
+    <a href="{{ url_for('tildel_vagt_opgave') }}" class="btn btn-primary">Opret ny vagt/opgave</a>
+
+    <!-- Nulstil vagter sektion -->
+    <div class="mt-4">
+        <h5>Nulstil vagter</h5>
+        <form method="post" action="{{ url_for('reset_vagtanmodninger') }}" style="display:inline;">
+            <button type="submit" class="btn btn-secondary btn-sm">Nulstil vagtanmodninger</button>
+        </form>
+        <form method="post" action="{{ url_for('reset_vagter') }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Nulstil alle vagter/opgaver</button>
+        </form>
+        <form method="post" action="{{ url_for('reset_afventende_vagter') }}" style="display:inline;">
+            <button type="submit" class="btn btn-warning btn-sm">Nulstil afventende vagter</button>
+        </form>
+        <form method="post" action="{{ url_for('reset_dagens_arbejde') }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Nulstil dagens arbejde</button>
+        </form>
+    </div>
+</div>
+
+<style>
+body {
+    background-color: #e5993bfc;
+}
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+.card-header {
+    border-radius: calc(1rem - 1px) calc(1rem - 1px) 0 0;
+}
+.table td {
+    vertical-align: middle;
+}
+</style>
+{% endblock %}

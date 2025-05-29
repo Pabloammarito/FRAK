@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Arbejdsplan{% endblock %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Velkommen</title>
+</head>
+<body>
+    <h2>Velkommen til den eksklusive side!</h2>
+    <p>Du er logget ind som: {{ session['email'] }}</p>
+    <a href="/logout">Log ud</a>
+</body>
+</html>
+
+{% if Vagtplan %}
+    {% for vagt in Vagtplan %}
+        <div class="Vagtplan-box">
+            <span>{{ vagt.date }}</span>
+            <span>{{ vagt.hours }} timer</span>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+{% if Opgaver %}
+    {% for job in Opgaver %}
+        <div class="Opgaver-box">
+            <span>{{ job.date }}</span>
+            <span>{{ job.Jobs }}</span>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+{% if inventory %}
+    {% for lager in inventory %}
+        <div class="inventory-box">
+            <span>{{ Tøjlager.tøj }}</span>
+            <span>{{ Tøjlager.størrelse }}</span>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if profil %}
+    {% for profil in Min_profil %}
+        <div class="profil-box">
+            <span>{{ profil.Navn }}</span>
+            <span>{{ profil.Adresse }}</span>
+        </div>
+        
+    {% endfor %}
+{% endif %}
+
+
+{% endblock %}

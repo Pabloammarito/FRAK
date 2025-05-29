@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Mine Opgaver{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('vagtplan') }}" class="btn btn-secondary mb-3">Tilbage til oversigt</a>
+
+<div class="container mt-4">
+  <h2>Mine Opgaver</h2>
+  
+  <!-- Opgaver tabel -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h3>Opgaver</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Dato</th>
+            <th>Job</th>
+            <th>Person</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for arbejde in dagens_arbejde %}
+            <tr>
+              <td>{{ arbejde[1] }}</td>
+              <td>{{ arbejde[2] }}</td>
+              <td>{{ arbejde[3] }}</td>
+              <td>
+                {% if arbejde[5] == 0 %}
+                  <span class="badge bg-warning">Afventer</span>
+                {% elif arbejde[5] == 1 %}
+                  <span class="badge bg-success">Bekræftet</span>
+                {% elif arbejde[5] == 2 %}
+                  <span class="badge bg-danger">Afslået</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mine opgaver -->
+  {% if bruger and bruger.opgaver %}
+    <h4 class="mt-4">Mine opgaver</h4>
+    <ul>
+      {% for opgave in bruger.opgaver %}
+        <li>{{ opgave['date'] }} – {{ opgave['description'] }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Du har ingen opgaver.</p>
+  {% endif %}
+  <a href="{{ url_for('vagtplan') }}" class="btn btn-secondary mt-3">Tilbage til oversigt</a>
+</div>
+{% endblock %}

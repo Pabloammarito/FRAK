@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Opret ny vagt/opgave</h2>
+        </div>
+        <div class="card-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('tildel_vagt_opgave') }}">
+                <div class="mb-3">
+                    <label class="form-label">Vælg type</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="entry_type" id="type_vagt" value="vagt" checked>
+                        <label class="form-check-label" for="type_vagt">Vagt</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="entry_type" id="type_opgave" value="opgave">
+                        <label class="form-check-label" for="type_opgave">Opgave uden vagt</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="medarbejder" class="form-label">Medarbejder</label>
+                    <select name="medarbejder" class="form-select" id="medarbejder" required>
+                        <option value="" selected disabled>Vælg medarbejder</option>
+                        {% for bruger in brugere %}
+                            <option value="{{ bruger[0] }}">
+                              {{ bruger[1] }} {{ bruger[2] }} ({{ bruger[3] }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="vagt_date" class="form-label">Dato</label>
+                    <input type="date" class="form-control" id="vagt_date" name="vagt_date" required>
+                </div>
+
+                <!-- Timer vises kun for vagter -->
+                <div class="mb-3" id="hours_container">
+                    <label for="vagt_hours" class="form-label">Timer</label>
+                    <input type="number" min="1" max="12" class="form-control" id="vagt_hours" name="vagt_hours">
+                </div>
+
+                <div class="mb-3">
+                    <label for="opgave_type" class="form-label">Opgave type</label>
+                    <select class="form-select" id="opgave_type" name="opgave_type">
+                        <option value="" selected disabled>Vælg opgavetype</option>
+                        <option value="Event">Event</option>
+                        <option value="Anlæg og vedligeholdelse">Anlæg og vedligeholdelse</option>
+                        <option value="Akademiet">Akademiet</option>
+                        <option value="Fritidsjob med mentor">Fritidsjob med mentor</option>
+                        <option value="Andet">Andet</option>
+                    </select>
+                </div>
+
+                <div class="mb-3" id="opgave_beskrivelse_container">
+                    <label for="opgave_beskrivelse" class="form-label">Opgavebeskrivelse</label>
+                    <textarea class="form-control" id="opgave_beskrivelse" name="opgave_beskrivelse" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Opret</button>
+            </form>
+        </div>
+    </div>
+    
+
+{% endblock %}

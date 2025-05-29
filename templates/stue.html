@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% block title %}Arbejdsplan{% endblock %}
+
+{% block content %}
+
+  {# — Vagtplan — #}
+
+  {# Regular vagtplan section continues here #}
+  {% if Vagtplan %}
+    <h2>Vagtplan</h2>
+    <ul>
+      {% for vagt in Vagtplan %}
+        <li>{{ vagt.date }} - {{ vagt.hours }} timer</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# — Opgaver — #}
+  {% if Opgaver %}
+    <h2>Opgaver</h2>
+    <ul>
+      {% for opg in Opgaver %}
+        <li>{{ opg.date }} - {{ opg.Jobs }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# — Lageroversigt med status og status-skift for ledere — #}
+  {% if inventory %}
+    <div class="container mt-5">
+      <h3 class="text-center mb-4">Lager</h3>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Størrelse</th>
+            <th>Antal</th>
+            <th>Status</th>
+            {% if session.is_admin %}
+              <th>Skift status</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inventory %}
+            <tr>
+              <td>{{ item[1] }}</td>
+              <td>{{ item[2] }}</td>
+              <td>{{ item[3] }}</td>
+              <td>
+                {% if item[4] == 'klar' %}
+                  <span class="badge bg-success">Klar</span>
+                {% elif item[4] == 'til_vask' %}
+                  <span class="badge bg-warning text-dark">Til vask</span>
+                {% elif item[4] == 'på_opgave' %}
+                  <span class="badge bg-info text-dark">På opgave</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ item[4] }}</span>
+                {% endif %}
+              </td>
+              {% if session.is_admin %}
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <a href="{{ url_for('opdater_toj_status', clothing_id=item[0], status='klar') }}" class="btn btn-outline-success">Klar</a>
+                    <a href="{{ url_for('opdater_toj_status', clothing_id=item[0], status='til_vask') }}" class="btn btn-outline-warning">Til vask</a>
+                  </div>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <!-- Lageroversigt med valg -->
+  {% if Tøjlager_dict %}
+<div class="container mt-4">
+    <h1 class="text-center">TøjLager</h1>
+    
+    <form id="tøj_form" method="POST" action="{{ url_for('select_size') }}">
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+            <!-- T-shirt -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">T-shirt</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for size, quantity in Tøjlager_dict.get('T-shirt', {}).items() %}
+                        <div class="form-check d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="size_selection[]" 
+                                       value="T-shirt|{{ size }}" id="tshirt_{{ size }}" 
+                                       {% if quantity <= 0 %}disabled{% endif %}>
+                                <label class="form-check-label" for="tshirt_{{ size }}">{{ size }}</label>
+                            </div>
+                            <span class="badge {% if quantity > 10 %}bg-success{% elif quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ quantity }} stk
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jakke -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Jakke</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for size, quantity in Tøjlager_dict.get('Jakke', {}).items() %}
+                        <div class="form-check d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="size_selection[]" 
+                                       value="Jakke|{{ size }}" id="jakke_{{ size }}" 
+                                       {% if quantity <= 0 %}disabled{% endif %}>
+                                <label class="form-check-label" for="jakke_{{ size }}">{{ size }}</label>
+                            </div>
+                            <span class="badge {% if quantity > 10 %}bg-success{% elif quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ quantity }} stk
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vest -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Vest</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for size, quantity in Tøjlager_dict.get('Vest', {}).items() %}
+                        <div class="form-check d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="size_selection[]" 
+                                       value="Vest|{{ size }}" id="vest_{{ size }}" 
+                                       {% if quantity <= 0 %}disabled{% endif %}>
+                                <label class="form-check-label" for="vest_{{ size }}">{{ size }}</label>
+                            </div>
+                            <span class="badge {% if quantity > 10 %}bg-success{% elif quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ quantity }} stk
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sko -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Sko</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for size, quantity in Tøjlager_dict.get('Sko', {}).items() %}
+                        <div class="form-check d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="size_selection[]" 
+                                       value="Sko|{{ size }}" id="sko_{{ size }}" 
+                                       {% if quantity <= 0 %}disabled{% endif %}>
+                                <label class="form-check-label" for="sko_{{ size }}">{{ size }}</label>
+                            </div>
+                            <span class="badge {% if quantity > 5 %}bg-success{% elif quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ quantity }} stk
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Handske -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Handske</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for size, quantity in Tøjlager_dict.get('Handske', {}).items() %}
+                        <div class="form-check d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="size_selection[]" 
+                                       value="Handske|{{ size }}" id="handske_{{ size }}" 
+                                       {% if quantity <= 0 %}disabled{% endif %}>
+                                <label class="form-check-label" for="handske_{{ size }}">{{ size }}</label>
+                            </div>
+                            <span class="badge {% if quantity > 10 %}bg-success{% elif quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ quantity }} stk
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-4">
+            <button type="submit" class="btn btn-primary">Tilføj til kurv</button>
+        </div>
+    </form>
+    
+    {% if selected_sizes %}
+    <div class="mt-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h3 class="mb-0">Din kurv</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Størrelse</th>
+                            <th>Antal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item, count in selected_sizes.items() %}
+                        {% set parts = item.split('|') %}
+                        <tr>
+                            <td>{{ parts[0] }}</td>
+                            <td>{{ parts[1] }}</td>
+                            <td>{{ count }}</td>
+                            <td>
+                                <a href="{{ url_for('remove_item', item=item) }}" class="btn btn-danger btn-sm">Fjern</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <div class="mt-3 d-flex justify-content-end">
+                    <form method="POST" action="{{ url_for('confirm_selection') }}" class="me-2">
+                        <button type="submit" class="btn btn-success">Bekræft valg</button>
+                    </form>
+                    <a href="{{ url_for('clear_selection') }}" class="btn btn-danger">Ryd alt</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+  {% endif %}
+
+  {# — Mine vagter og opgaver sektion — #}
+  {% if bruger and bruger.vagter %}
+    <h4 class="mt-4">Mine vagter</h4>
+    <ul>
+      {% for vagt in bruger.vagter %}
+        <li>{{ vagt[0] }} - {{ vagt[1] }} timer 
+            {% if vagt[2] == 1 %}(Bekræftet)
+            {% elif vagt[2] == 2 %}(Afvist)
+            {% else %}(Afventer){% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if bruger and bruger.opgaver %}
+    <h4 class="mt-4">Mine opgaver</h4>
+    <ul>
+      {% for opgave in bruger.opgaver %}
+        <li>{{ opgave[1] }} - {{ opgave[2] }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+
+  <style>
+    body {
+      background-color: #FFB347; /* Orange background */
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .card, .table, .alert {
+      background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for better contrast */
+    }
+    
+    .container {
+      background-color: transparent;
+    }
+
+    .confirmed-shift {
+      background-color: rgba(232, 162, 51, 0.9);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border-left: 4px solid #28a745;
+    }
+
+    .shift-details {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .message {
+      font-style: italic;
+      color: #666;
+    }
+  </style>
+
+  {% if Tøjlager_dict %}
+  <form method="post" action="{{ url_for('reset_lager') }}">
+      <button type="submit" class="btn btn-danger mb-3">Nulstil lager</button>
+  </form>
+  {% endif %}
+
+{% endblock %}

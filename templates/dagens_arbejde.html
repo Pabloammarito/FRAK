@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Dagens Arbejde{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Dagens arbejde</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Medarbejder</th>
+                        <th>Dato</th>
+                        <th>Opgave</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for arbejde in dagens_arbejde %}
+                    <tr>
+                        <td>{{ arbejde.name }}</td>
+                        <td>{{ arbejde.date }}</td>
+                        <td>{{ arbejde.job }}</td>
+                        <td>
+                            {% if arbejde.status == 0 %}
+                                <span class="badge bg-secondary">Afventer</span>
+                            {% elif arbejde.status == 1 %}
+                                <span class="badge bg-info">Igang</span>
+                            {% elif arbejde.status == 2 %}
+                                <span class="badge bg-success">Afsluttet</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

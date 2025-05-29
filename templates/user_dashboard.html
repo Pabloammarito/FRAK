@@ -1,0 +1,89 @@
+<!-- templates/user_dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Mit Dashboard</h2>
+
+<h4>Dine kommende vagter</h4>
+{% if vagter %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Dato</th>
+                <th>Timer</th>
+                <th>Status</th>
+                <th>Handling</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vagt in vagter %}
+        <tr>
+            <td>{{ vagt.date }}</td>
+            <td>{{ vagt.hours }}</td>
+            <td>
+                {% if vagt.done == 0 or vagt.done is none %}
+                    <form action="{{ url_for('set_vagt_status', vagt_id=vagt.id, status=1) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-info btn-sm">Igang</button>
+                    </form>
+                    <form action="{{ url_for('set_vagt_status', vagt_id=vagt.id, status=2) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm">Done</button>
+                    </form>
+                {% elif vagt.done == 1 %}
+                    <span class="badge bg-info">Igang</span>
+                    <form action="{{ url_for('set_vagt_status', vagt_id=vagt.id, status=2) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm">Done</button>
+                    </form>
+                {% elif vagt.done == 2 %}
+                    <span class="badge bg-success">Afsluttet</span>
+                {% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for('bekraeft_vagt', vagt_id=vagt.id) }}" method="post">
+                    <button type="submit" class="btn btn-success btn-sm">Bekræft</button>
+                </form>
+                <form action="{{ url_for('afslaa_vagt', vagt_id=vagt.id) }}" method="post" style="display:inline;">
+                    <input type="text" name="grund" placeholder="Afslagsgrund" required>
+                    <button type="submit" class="btn btn-danger btn-sm">Afslå</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Du har ingen kommende vagter.</p>
+{% endif %}
+
+<h4>Dine opgaver</h4>
+{% if opgaver %}
+    <ul>
+    {% for opgave in opgaver %}
+        <li>
+            Dato: {{ opgave.date }} | Beskrivelse: {{ opgave.description }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Du har ingen opgaver.</p>
+{% endif %}
+
+<h4>Dagens arbejde (seneste 2 uger)</h4>
+{% if dagens_arbejde %}
+    <ul>
+    {% for arbejde in dagens_arbejde %}
+        <li>
+            Dato: {{ arbejde[0] }} | Job: {{ arbejde[1] }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Ingen registreret arbejde de sidste 2 uger.</p>
+{% endif %}
+
+<h4>Anmod om vagt</h4>
+<form method="post" action="{{ url_for('anmod_vagt') }}" class="d-flex gap-2 mb-3">
+    <input type="date" name="vagt_date" class="form-control" required>
+    <input type="number" name="vagt_hours" class="form-control" placeholder="Timer" min="1" required>
+    <button type="submit" class="btn btn-primary">Anmod om vagt</button>
+</form>
+{% endblock %}

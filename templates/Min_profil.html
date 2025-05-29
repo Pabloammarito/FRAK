@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="container mt-5" id="profil-section">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Min Profil</h3>
+            <a href="{{ url_for('rediger_profil') }}" class="btn btn-outline-light btn-sm">Rediger</a>
+          </div>
+          <div class="card-body">
+            <div class="row g-4 align-items-center">
+              <div class="col-md-4 text-center">
+                <img src="{{ bruger.billede or '/static/profilbillede.jpg' }}"
+                     class="img-fluid rounded-circle border border-3"
+                     alt="Profilbillede"
+                     style="max-width: 150px;">
+              </div>
+              <div class="col-md-8">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"><strong>Navn:</strong> {{ bruger.fornavn }} {{ bruger.efternavn }}</li>
+                  <li class="list-group-item"><strong>Email:</strong> {{ bruger.email }}</li>
+                  <li class="list-group-item"><strong>Adresse:</strong> {{ bruger.adresse or bruger.address }}</li>
+                  <li class="list-group-item"><strong>Alder:</strong> {{ bruger.alder or bruger.age }}</li>
+                  <li class="list-group-item"><strong>Størrelse:</strong> {{ bruger.størrelse or bruger.size }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="text-align:center; font-size:3rem; font-weight:bold;">Tøjlager (Admin)</h1>
+
+<form method="post" action="{{ url_for('admin_reset_tojlager') }}" style="text-align:center; margin-bottom: 2rem;">
+    <button type="submit" class="btn btn-danger">Nulstil lager og brugervalg</button>
+</form>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+    {% set typer = ['T-shirt', 'Jakke', 'Vest', 'Sko', 'Handske'] %}
+    {% for tøjtype in typer %}
+    <div style="background: #fff; border-radius: 20px; box-shadow: 0 2px 8px #0001; width: 350px; margin-bottom: 2rem;">
+        <div style="background: #1677ff; color: #fff; border-radius: 20px 20px 0 0; padding: 1rem; font-size: 2rem; font-weight: bold; text-align: center;">
+            {{ tøjtype }}
+        </div>
+        <div style="padding: 1rem;">
+            {% if tøjtype == 'Sko' %}
+                {% for type, size, quantity in lager if type == 'Sko' %}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>Str. {{ size }}</span>
+                    <span style="background: #1ca55c; color: #fff; border-radius: 10px; padding: 0.2rem 0.8rem; font-weight: bold;">{{ quantity }} stk</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                {% for type, size, quantity in lager if type == tøjtype %}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>{{ size }}</span>
+                    <span style="background: #1ca55c; color: #fff; border-radius: 10px; padding: 0.2rem 0.8rem; font-weight: bold;">{{ quantity }} stk</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h2 style="text-align:center; margin-top: 3rem;">Brugeres valg</h2>
+<div style="overflow-x:auto;">
+<table style="margin:auto; border-collapse:collapse; min-width:600px;">
+    <tr style="background:#1677ff; color:#fff;">
+        <th style="padding:8px;">Email</th>
+        <th style="padding:8px;">Type</th>
+        <th style="padding:8px;">Størrelse</th>
+        <th style="padding:8px;">Antal</th>
+        <th style="padding:8px;">Tidspunkt</th>
+    </tr>
+    {% for email, type, size, quantity, valgt_tidspunkt in bruger_valg %}
+    <tr style="background: #fff;">
+        <td style="padding:8px;">{{ email }}</td>
+        <td style="padding:8px;">{{ type }}</td>
+        <td style="padding:8px;">{{ size }}</td>
+        <td style="padding:8px;">{{ quantity }}</td>
+        <td style="padding:8px;">{{ valgt_tidspunkt }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}
