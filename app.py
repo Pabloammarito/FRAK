@@ -1338,10 +1338,10 @@ update_user_names()
 def reset_lager():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Nulstil Jakke, T-shirt, Handske, Vest til 20 stk
+    
     for type in ['T-shirt', 'Jakke', 'Handske', 'Vest']:
         c.execute('UPDATE tøjlager SET quantity = 20 WHERE type = ?', (type,))
-    # Nulstil Sko til 10 stk for str. 38-46
+    
     for size in range(38, 47):
         c.execute('UPDATE tøjlager SET quantity = 10 WHERE type = ? AND size = ?', ('Sko', str(size)))
     conn.commit()
@@ -1357,10 +1357,10 @@ def admin_tojlager():
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Hent lagerstatus
+    
     c.execute('SELECT type, size, quantity FROM tøjlager ORDER BY type, size')
     lager = c.fetchall()
-    # Hent alle brugeres valg
+    
     c.execute('''
         SELECT u.email, ut.type, ut.size, ut.quantity, ut.valgt_tidspunkt
         FROM user_tojvalg ut
@@ -1377,12 +1377,12 @@ def admin_reset_tojlager():
         return redirect(url_for('admin_tojlager'))
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Nulstil tøjlager
+    
     for type in ['T-shirt', 'Jakke', 'Handske', 'Vest']:
         c.execute('UPDATE tøjlager SET quantity = 20 WHERE type = ?', (type,))
     for size in range(38, 47):
         c.execute('UPDATE tøjlager SET quantity = 10 WHERE type = ? AND size = ?', ('Sko', str(size)))
-    # Slet alle brugervalg
+    
     c.execute('DELETE FROM user_tojvalg')
     conn.commit()
     conn.close()
