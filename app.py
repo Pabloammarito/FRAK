@@ -975,7 +975,7 @@ def bekraeft_vagt(vagt_id):
     c = conn.cursor()
     
     try:
-        # Bekræft at vagten tilhører brugeren
+        
         c.execute('SELECT id, date FROM vagtplan WHERE id = ? AND ungearbejder = ?', 
                  (vagt_id, session['user_id']))
         vagt = c.fetchone()
@@ -983,7 +983,7 @@ def bekraeft_vagt(vagt_id):
             flash('Du har ikke adgang til denne vagt.', 'danger')
             return redirect(url_for('vagtplan'))
         
-        # Opdater vagtens status til bekræftet
+        
         c.execute('''UPDATE vagtplan 
                      SET confirmed = 1, confirmed_at = CURRENT_TIMESTAMP 
                      WHERE id = ?''', 
@@ -1029,14 +1029,14 @@ def afslaa_vagt(vagt_id):
     c = conn.cursor()
     
     try:
-        # Bekræft at vagten tilhører brugeren
+        
         c.execute('SELECT id FROM vagtplan WHERE id = ? AND ungearbejder = ?', 
                  (vagt_id, session['user_id']))
         if not c.fetchone():
             flash('Du har ikke adgang til denne vagt.', 'danger')
             return redirect(url_for('vagtplan'))
         
-        # Opdater vagtens status til afslået
+        
         c.execute('''UPDATE vagtplan 
                      SET confirmed = 2, afslag_grund = ?, confirmed_at = CURRENT_TIMESTAMP 
                      WHERE id = ?''', 
@@ -1189,7 +1189,7 @@ def fjern_vagt(vagt_id):
 def create_admin_user():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Tjek om brugeren allerede findes
+    
     c.execute('SELECT * FROM users WHERE email=?', ('admin@example.com',))
     if not c.fetchone():
         hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
@@ -1213,7 +1213,7 @@ def gentildel_vagt(vagt_id):
     c = conn.cursor()
     
     try:
-        # Reset vagten til afventende status
+        
         c.execute('''UPDATE vagtplan 
                      SET confirmed = 0, confirmed_at = NULL, afslag_grund = NULL 
                      WHERE id = ?''', 
@@ -1239,7 +1239,7 @@ def admin_vagtanmodning(anmodning_id, status):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
-        # Opdater status på vagtanmodningen (1=godkendt, 2=afvist)
+        
         c.execute('UPDATE vagt_anmodninger SET status = ? WHERE id = ?', (status, anmodning_id))
         conn.commit()
         if status == 1:
@@ -1271,7 +1271,7 @@ def reset_afventende_vagter():
         return redirect(url_for('admin_vagtplan'))
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Slet ALLE vagter (fjern WHERE-betingelsen)
+    
     c.execute('DELETE FROM vagtplan')
     conn.commit()
     conn.close()
@@ -1296,7 +1296,7 @@ def set_vagt_status(vagt_id, status):
         return redirect(url_for('login'))
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Opdater status i dagens_arbejde (0=afventer, 1=igang, 2=done)
+    
     c.execute('UPDATE dagens_arbejde SET status=? WHERE vagt_id=? AND person=?', (status, vagt_id, session['user_id']))
     conn.commit()
     conn.close() 
@@ -1317,7 +1317,7 @@ def add_name_columns():
 
 add_name_columns()
 
-# Update user names based on email
+
 def update_user_names():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -1391,6 +1391,7 @@ def admin_reset_tojlager():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
