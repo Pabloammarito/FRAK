@@ -439,12 +439,11 @@ def confirm_selection():
         conn.commit()
         flash('Dit valg er bekræftet og registreret.', 'success')
         
-        # Registrer valget på brugerens profil
         c.execute('UPDATE users SET size = ? WHERE id = ?', 
                  (', '.join(selections.keys()), session['user_id']))
         conn.commit()
         
-        # Ryd valgte størrelser i sessionen
+        
         session.pop('selected_sizes', None)
         
     except sqlite3.Error as e:
@@ -1391,6 +1390,7 @@ def admin_reset_tojlager():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
